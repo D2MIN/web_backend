@@ -1,0 +1,17 @@
+*{
+    margin: 0px;
+}
+
+.main {
+    display: flex;
+    justify-content: center;
+    background-color: rgb(44, 44, 44);
+}
+.img_wrapper {
+    display: flex;
+    flex-direction: column;
+}
+.img_wrapper img{
+    margin: 20px 0px;
+    box-shadow:-10px 0px 100px 3px red;
+}
