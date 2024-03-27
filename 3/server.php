@@ -43,13 +43,13 @@
 
   $error = "";
   switch (true) {
-    case !(preg_match('/^[а-яё А-ЯЁ]*$/', $name)):
+    case !(preg_match('/^[\p{Cyrillic}\s]*$/u', $name)):
         $error = "Имя содержит неправильные символы, убедитесь что вы все ввели верно<br>";
         break;
     case !(strlen($name) < 100):
         $error = "Имя содержит слишком много символов, убедитесь что вы все ввели верно<br>";
         break;
-    case !(preg_match('/^[а-яё А-ЯЁ]*$/', $surname)):
+    case !(preg_match('/^[\p{Cyrillic}\s]*$/u', $surname)):
         $error = "Фамилия содержит неправильные символы, убедитесь что вы все ввели верно<br>";
         break;
     case !(strlen($surname) < 100):
@@ -58,7 +58,7 @@
     case !(strlen($number) == 10):
         $error = "Номер введен не верно, убедитесь что вы все ввели верно<br>";
         break;
-    case (intval(substr($date, 0, 4)) > 2024):
+    case (intval(substr($date, 0, 4)) > 2016):
         $error = "Похоже вы слишком малы для использования формы, убедитесь что вы все ввели верно<br>";
         break;
     default:
