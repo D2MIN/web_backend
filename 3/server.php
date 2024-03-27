@@ -55,7 +55,7 @@
     case !(strlen($surname) < 100):
         $error = "Фамилия содержит слишком много символов, убедитесь что вы все ввели верно<br>";
         break;
-    case !(strlen($number) == 10):
+    case !(strlen($number) == 11):
         $error = "Номер введен не верно, убедитесь что вы все ввели верно<br>";
         break;
     case (intval(substr($date, 0, 4)) > 2016):
