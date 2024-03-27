@@ -18,8 +18,6 @@
   $gen = mysqli_real_escape_string($conn, $_POST['gen']);
   $about = mysqli_real_escape_string($conn, $_POST['about']);
 
-  $query = "INSERT INTO users (person_name,person_surname,number,email,year,gen,about) VALUES ('$name', '$surname','$number','$email','$date', '$gen','$about')";
-
   $lengs = $_POST['leng'];
   $arr_len = ["Pascal","C","C++","JavaScript","PHP","Python","Java","Haskel","Clijure","Prolog","Scara"];
   $arr_num_len = [0,0,0,0,0,0,0,0,0,0,0];
@@ -43,49 +41,100 @@
   $e10 = mysqli_real_escape_string($conn, $arr_num_len[9]);
   $e11 = mysqli_real_escape_string($conn, $arr_num_len[10]);
 
-  mysqli_query($conn, $query);
+  $error = "";
+  switch (true) {
+    case !(preg_match('/^[а-яё А-ЯЁ]*$/', $name)):
+        $error = "Имя содержит неправильные символы, убедитесь что вы все ввели верно<br>";
+        break;
+    case !(strlen($name) < 100):
+        $error = "Имя содержит слишком много символов, убедитесь что вы все ввели верно<br>";
+        break;
+    case !(preg_match('/^[а-яё А-ЯЁ]*$/', $surname)):
+        $error = "Фамилия содержит неправильные символы, убедитесь что вы все ввели верно<br>";
+        break;
+    case !(strlen($surname) < 100):
+        $error = "Фамилия содержит слишком много символов, убедитесь что вы все ввели верно<br>";
+        break;
+    case !(strlen($number) == 10):
+        $error = "Номер введен не верно, убедитесь что вы все ввели верно<br>";
+        break;
+    case (intval(substr($date, 0, 4)) > 2024):
+        $error = "Похоже вы слишком малы для использования формы, убедитесь что вы все ввели верно<br>";
+        break;
+    default:
+      $query = "INSERT INTO users (person_name,person_surname,number,email,year,gen,about) VALUES ('$name', '$surname','$number','$email','$date', '$gen','$about')";
 
-  $user_id = mysqli_insert_id($conn);
+      mysqli_query($conn, $query);
 
-  $query = "INSERT INTO leng (id,pascal,c,cpp,js,php,python,java,haskel,clijure,prolog,scara) VALUES ('$user_id','$e1', '$e2','$e3','$e4','$e5', '$e6','$e7','$e8','$e9','$e10','$e11')";
+     $user_id = mysqli_insert_id($conn);
 
-  if (mysqli_query($conn, $query)) {
-    echo 'Данные успешно сохранены' . "<br>";
-  } else {
-    echo 'Ошибка сохранения данных: ' . mysqli_error($conn);
+      $query = "INSERT INTO leng (id,pascal,c,cpp,js,php,python,java,haskel,clijure,prolog,scara) VALUES ('$user_id','$e1', '$e2','$e3','$e4','$e5', '$e6','$e7','$e8','$e9','$e10','$e11')";
+
+      if (mysqli_query($conn, $query)) {
+        echo 'Данные успешно сохранены' . "<br>";
+      } else {
+        echo 'Ошибка сохранения данных: ' . mysqli_error($conn);
+      }
   }
-
-  $query = "SELECT users.person_name, users.person_surname, users.number, users.email, users.year, users.gen, users.about, leng.pascal, leng.c, leng.cpp, leng.js, leng.php, leng.python, leng.java, leng.haskel, leng.clijure, leng.prolog, leng.scara
-          FROM users
-          INNER JOIN leng ON users.id = leng.id";
-
-$result = mysqli_query($conn, $query);
-
-if (mysqli_num_rows($result) > 0) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        echo "Имя: " . $row["person_name"] . "<br>";
-        echo "Фамилия: " . $row["person_surname"] . "<br>";
-        echo "Номер телефона: " . $row["number"] . "<br>";
-        echo "Электронная почта: " . $row["email"] . "<br>";
-        echo "Год рождения: " . $row["year"] . "<br>";
-        echo "Пол: " . $row["gen"] . "<br>";
-        echo "О себе: " . $row["about"] . "<br>";
-        echo "Pascal: " . $row["pascal"] . "<br>";
-        echo "C: " . $row["c"] . "<br>";
-        echo "C++: " . $row["cpp"] . "<br>";
-        echo "JavaScript: " . $row["js"] . "<br>";
-        echo "PHP: " . $row["php"] . "<br>";
-        echo "Python: " . $row["python"] . "<br>";
-        echo "Java: " . $row["java"] . "<br>";
-        echo "Haskel: " . $row["haskel"] . "<br>";
-        echo "Clijure: " . $row["clijure"] . "<br>";
-        echo "Prolog: " . $row["prolog"] . "<br>";
-        echo "Scara: " . $row["scara"] . "<br>";
-        echo "<hr>";
-    }
-} else {
-    echo "Нет результатов";
-}
-
-  mysqli_close($conn);
 ?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Моя страница</title>
+    <link rel="stylesheet" type="text/css" href="stylePageTwo.css">
+</head>
+<body>
+      <div class="error">
+        <?php if ($error !== ""): ?>
+          <?php echo $error ?>
+          <a class="btn" href="javascript:history.back()"><input type="button" value="Вернутся"></input></a>
+        <?php endif;?>
+      </div>
+
+      <?php if ($error == ""): ?>
+        <div class="tables">
+          <?php
+          $query = "SELECT users.person_name, users.person_surname, users.number, users.email, users.year, users.gen, users.about, leng.pascal, leng.c, leng.cpp, leng.js, leng.php, leng.python, leng.java, leng.haskel, leng.clijure, leng.prolog, leng.scara
+                  FROM users
+                  INNER JOIN leng ON users.id = leng.id";
+
+          $result = mysqli_query($conn, $query);
+          ?>
+
+          <?php while ($row = mysqli_fetch_assoc($result)): ?>
+              <div class="colom">
+                  <?php
+                  echo "Имя: " . $row["person_name"] . "<br>";
+                  echo "Фамилия: " . $row["person_surname"] . "<br>";
+                  echo "Номер телефона: " . $row["number"] . "<br>";
+                  echo "Электронная почта: " . $row["email"] . "<br>";
+                  echo "Год рождения: " . $row["year"] . "<br>";
+                  echo "Пол: " . $row["gen"] . "<br>";
+                  echo "О себе: " . $row["about"] . "<br>";
+                  ?>
+                  <div class="leng">
+                    Владеет языками:
+                    <?php
+                    if($row["pascal"] == "1"){echo "Pascal, ";}
+                    if($row["c"] == "1"){echo "C, ";}
+                    if($row["cpp"] == "1"){echo "C++, ";}
+                    if($row["js"] == "1"){echo "JS, ";}
+                    if($row["php"] == "1"){echo "php, ";}
+                    if($row["python"] == "1"){echo "python, ";}
+                    if($row["java"] == "1"){echo "java, ";}
+                    if($row["haskel"] == "1"){echo "haskel, ";}
+                    if($row["clijure"] == "1"){echo "clijure, ";}
+                    if($row["prolog"] == "1"){echo "prolog, ";}
+                    if($row["scara"] == "1"){echo "scara ," ;}
+                    ?>
+                  </div>
+              </div>
+          <?php endwhile; ?>
+        </div>
+        <a class="btn" href="javascript:history.back()"><input type="button" value="Вернутся"></input></a>
+      <?php endif; ?>
+</body>
+</html>
+
+<?php mysqli_close($conn);?>
